@@ -6,86 +6,92 @@ Created on Wed Dec 20 20:18:45 2023
 @author: shyamanand
 """
 
-import heapq
 import networkx as nx
 import matplotlib.pyplot as plt
 
-def dijkstra(graph, source):
-    visited = set()
-    distance = {vertex: float('infinity') for vertex in graph}
-    distance[source] = 0
-    priority_queue = [(0, source)]
+class Graph:
+    def __init__(self):
+        self.graph = nx.DiGraph()
 
-    while priority_queue:
-        current_distance, current_vertex = heapq.heappop(priority_queue)
+    def add_node(self, value):
+        self.graph.add_node(value)
 
-        if current_vertex in visited:
-            continue
+    def add_edge(self, from_node, to_node, weight):
+        self.graph.add_edge(from_node, to_node, weight=weight)
 
-        visited.add(current_vertex)
+def dijkstra(graph, start):
+    dist = {node: float('inf') for node in graph.nodes}
+    prev_nodes = {node: None for node in graph.nodes}
+    dist[start] = 0
 
-        for neighbor, weight in graph[current_vertex].items():
-            distance_through_current = current_distance + weight
+    unvisited_nodes = set(graph.nodes)
 
-            if distance_through_current < distance[neighbor]:
-                distance[neighbor] = distance_through_current
-                heapq.heappush(priority_queue, (distance_through_current, neighbor))
+    while unvisited_nodes:
+        curr_node = min(unvisited_nodes, key=lambda node: dist[node])
+        unvisited_nodes.remove(curr_node)
 
-    return distance
+        for neighbor, edge_data in graph[curr_node].items():
+            dist_to_neighbor = dist[curr_node] + edge_data['weight']
+            if dist_to_neighbor < dist[neighbor]:
+                dist[neighbor] = dist_to_neighbor
+                prev_nodes[neighbor] = curr_node
 
-simple_graph = {'A': {'B': 1, 'C': 4}, 'B': {'A': 1, 'C': 2}, 'C': {'A': 4, 'B': 2}}
-source_vertex_1 = 'B'
-result_1 = dijkstra(simple_graph, source_vertex_1)
-print(f"Shortest distances from {source_vertex_1}: {result_1}")
-print("\n\n")
+    return dist, prev_nodes
 
-G1 = nx.Graph(simple_graph)
-pos1 = nx.spring_layout(G1)
-nx.draw(G1, pos1, with_labels=True, node_size=700, font_size=10, font_color="white", node_color="skyblue", font_weight="bold", width=2)
-labels1 = nx.get_edge_attributes(G1, 'weight')
-nx.draw_networkx_edge_labels(G1, pos1, edge_labels=labels1)
-plt.title(f"Simple Graph (Dijkstra's Shortest Path from {source_vertex_1})")
-plt.show()
+def visualize_graph(graph):
+    pos = nx.spring_layout(graph.graph)
+    nx.draw(graph.graph, pos, with_labels=True, font_weight='bold', node_size=700, node_color='skyblue', font_size=8, connectionstyle="arc3,rad=0.1")
+    edge_labels = nx.get_edge_attributes(graph.graph, 'weight')
+    nx.draw_networkx_edge_labels(graph.graph, pos, edge_labels=edge_labels)
+    plt.title("Graph Visualization")
+    plt.show()
 
-medium_graph = {'A': {'B': 2, 'C': 5}, 'B': {'A': 2, 'C': 1, 'D': 3}, 'C': {'A': 5, 'B': 1, 'D': 2}, 'D': {'B': 3, 'C': 2}}
-source_vertex_2 = 'C'
-result_2 = dijkstra(medium_graph, source_vertex_2)
-print(f"Shortest distances from {source_vertex_2}: {result_2}")
-print("\n\n")
+# Test Case 1
+g1 = Graph()
+g1.add_node("A")
+g1.add_node("B")
+g1.add_node("C")
+g1.add_edge("A", "B", 2)
+g1.add_edge("B", "C", 1)
+g1.add_edge("A", "C", 4)
+print("Test Case 1:")
+visualize_graph(g1)
+d1, p1 = dijkstra(g1.graph, "A")
+print("Shortest Distances from A:", d1)
+print("Previous Nodes:", p1)
+print()
 
-G2 = nx.Graph(medium_graph)
-pos2 = nx.spring_layout(G2)
-nx.draw(G2, pos2, with_labels=True, node_size=700, font_size=10, font_color="white", node_color="lightcoral", font_weight="bold", width=2)
-labels2 = nx.get_edge_attributes(G2, 'weight')
-nx.draw_networkx_edge_labels(G2, pos2, edge_labels=labels2)
-plt.title(f"Medium Complexity Graph (Dijkstra's Shortest Path from {source_vertex_2})")
-plt.show()
+# Test Case 2
+g2 = Graph()
+g2.add_node("A")
+g2.add_node("B")
+g2.add_node("C")
+g2.add_node("D")
+g2.add_edge("A", "B", 1)
+g2.add_edge("B", "C", 2)
+g2.add_edge("C", "D", 1)
+g2.add_edge("A", "C", 4)
+g2.add_edge("B", "D", 7)
+print("Test Case 2:")
+visualize_graph(g2)
+d2, p2 = dijkstra(g2.graph, "A")
+print("Shortest Distances from A:", d2)
+print("Previous Nodes:", p2)
+print()
 
-complex_graph = {'A': {'B': 2, 'C': 5}, 'B': {'A': 2, 'C': 1, 'D': 3, 'E': 6}, 'C': {'A': 5, 'B': 1, 'D': 2}, 'D': {'B': 3, 'C': 2, 'E': 4}, 'E': {'B': 6, 'D': 4, 'F': 8}, 'F': {'E': 8}}
-source_vertex_3 = 'A'
-result_3 = dijkstra(complex_graph, source_vertex_3)
-print(f"Shortest distances from {source_vertex_3}: {result_3}")
-print("\n\n")
-
-G3 = nx.Graph(complex_graph)
-pos3 = nx.spring_layout(G3)
-nx.draw(G3, pos3, with_labels=True, node_size=700, font_size=10, font_color="white", node_color="lightgreen", font_weight="bold", width=2)
-labels3 = nx.get_edge_attributes(G3, 'weight')
-nx.draw_networkx_edge_labels(G3, pos3, edge_labels=labels3)
-plt.title(f"More Nodes and Edges Graph (Dijkstra's Shortest Path from {source_vertex_3})")
-plt.show()
-
-directed_graph = {'A': {'B': 2, 'C': 5}, 'B': {'C': 1, 'D': 3}, 'C': {'D': 2}, 'D': {}}
-source_vertex_4 = 'D'
-result_4 = dijkstra(directed_graph, source_vertex_4)
-print(f"Shortest distances from {source_vertex_4}: {result_4}")
-print("\n\n")
-
-
-G4 = nx.DiGraph(directed_graph)
-pos4 = nx.spring_layout(G4)
-nx.draw(G4, pos4, with_labels=True, node_size=700, font_size=10, font_color="white", node_color="gold", font_weight="bold", width=2)
-labels4 = nx.get_edge_attributes(G4, 'weight')
-nx.draw_networkx_edge_labels(G4, pos4, edge_labels=labels4)
-plt.title(f"Directed Graph (Dijkstra's Shortest Path from {source_vertex_4})")
-plt.show()
+# Test Case 3
+g3 = Graph()
+g3.add_node("A")
+g3.add_node("B")
+g3.add_node("C")
+g3.add_node("D")
+g3.add_edge("A", "B", 3)
+g3.add_edge("B", "C", 1)
+g3.add_edge("C", "D", 5)
+g3.add_edge("A", "C", 2)
+g3.add_edge("B", "D", 2)
+print("Test Case 3:")
+visualize_graph(g3)
+d3, p3 = dijkstra(g3.graph, "A")
+print("Shortest Distances from A:", d3)
+print("Previous Nodes:", p3)
