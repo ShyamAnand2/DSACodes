@@ -48,21 +48,6 @@ graph_2 = {
     '3': {'1': 2, '2': 3}
 }
 
-graph_3 = {
-    'X': {'Y': 2, 'Z': 1, 'W': 3},
-    'Y': {'X': 2, 'Z': 3, 'W': 1},
-    'Z': {'X': 1, 'Y': 3, 'W': 2},
-    'W': {'X': 3, 'Y': 1, 'Z': 2}
-}
-
-graph_4 = {
-    'M': {'N': 2, 'O': 3, 'P': 1},
-    'N': {'M': 2, 'O': 1, 'P': 4},
-    'O': {'M': 3, 'N': 1, 'P': 2},
-    'P': {'M': 1, 'N': 4, 'O': 2}
-}
-
-
 print("AS ARROWS ARE NOT HIGHLIGHTED IN THE PLOT, CHECK KERNEL FOR THE TRAVELLING OF THE SHORTEST PATH DISTANCE.")
 # Run Prim's algorithm on Sample Graphs, print the resulting minimum spanning tree, and plot the graphs
 start_node = list(graph_1.keys())[0]
@@ -76,16 +61,3 @@ min_spanning_tree_2 = prim(graph_2, start_node)
 print("\nMinimum Spanning Tree (Prim) - Sample Case 2:")
 print(min_spanning_tree_2)
 plot_graph_with_edges(graph_2, min_spanning_tree_2, "Minimum Spanning Tree (Prim) - Sample Case 2")
-
-start_node = list(graph_3.keys())[0]
-min_spanning_tree_3 = prim(graph_3, start_node)
-print("\nMinimum Spanning Tree (Prim) - Sample Case 3:")
-print(min_spanning_tree_3)
-plot_graph_with_edges(graph_3, min_spanning_tree_3, "Minimum Spanning Tree (Prim) - Sample Case 3")
-
-start_node = list(graph_4.keys())[0]
-min_spanning_tree_4 = prim(graph_4, start_node)
-print("\nMinimum Spanning Tree (Prim) - Sample Case 4:")
-print(min_spanning_tree_4)
-plot_graph_with_edges(graph_4, min_spanning_tree_4, "Minimum Spanning Tree (Prim) - Sample Case 4")
-
