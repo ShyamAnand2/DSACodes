@@ -26,28 +26,28 @@ def bfs(graph, start):
 # Sample Graphs
 graph_1 = {
     'A': ['B', 'C'],
-    'B': ['A', 'D', 'E'],
-    'C': ['A', 'F', 'G'],
-    'D': ['B'],
-    'E': ['B'],
-    'F': ['C'],
-    'G': ['C']
+    'B': ['D'],
+    'C': ['F'],
+    'D': ['A'],
+    'E': ['C'],
+    'F': ['G'],
+    'G': ['E']
 }
 
 graph_2 = {
-    '1': ['2', '3'],
-    '2': ['1', '4', '5'],
-    '3': ['1', '6', '7'],
-    '4': ['2'],
-    '5': ['2'],
-    '6': ['3'],
-    '7': ['3']
+    '1': ['3'],
+    '2': ['4', '5'],
+    '3': ['6', '7'],
+    '4': ['1'],
+    '5': ['7'],
+    '6': ['2','4'],
+    '7': ['1']
 }
 
 graph_3 = {
     'X': ['Y', 'Z'],
-    'Y': ['X', 'W'],
-    'Z': ['X'],
+    'Y': ['W'],
+    'Z': [],
     'W': ['Y']
 }
 
@@ -58,9 +58,9 @@ graph_4 = {
 }
 
 def plot_graph(graph, title):
-    G = nx.Graph(graph)
+    G = nx.DiGraph(graph)
     pos = nx.spring_layout(G)
-    nx.draw(G, pos, with_labels=True, node_size=700, font_size=10, font_color="black", node_color="skyblue", font_weight="bold", width=2)
+    nx.draw(G, pos, with_labels=True, node_size=700, font_size=10, font_color="black", node_color="skyblue", font_weight="normal", width=1)
     plt.title(title)
     plt.show()
 
@@ -80,3 +80,4 @@ plot_graph(graph_3, "Sample Case 3 - BFS")
 print("\nSample Case 4:")
 bfs(graph_4, 'M')
 plot_graph(graph_4, "Sample Case 4 - BFS")
+
