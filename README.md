@@ -1,2 +1,11 @@
 # DSACodes
-19CCE202 Final assignment codes for different types of shortest-path algorithms and their various test cases codes.
+19CCE202: Data Structures and Algorithms
+
+The codes which are uploaded here encompass the following topics:
+• Dijkstra's Algorithm
+• Floyd's Algorithm
+• Dynamic Programming Algorithm
+• Breadth-First Search
+• Depth-First Search
+• Prim's Algorithm
+• Kruskal's Algorithm
