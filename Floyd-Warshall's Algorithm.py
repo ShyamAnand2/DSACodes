@@ -7,69 +7,77 @@ Created on Wed Dec 20 21:40:01 2023
 """
 import networkx as nx
 import matplotlib.pyplot as plt
-import numpy as np
 
-def floyd_warshall(graph):
-    V = len(graph)
-    distance_matrix = np.full((V, V), np.inf)
-    
-    for i, row in enumerate(graph):
-        for j, weight in enumerate(row):
-            distance_matrix[i, j] = weight
+class Graph:
+    def __init__(self):
+        self.graph = nx.DiGraph()  # Use DiGraph for directed edges
 
-    for k in range(V):
-        for i in range(V):
-            for j in range(V):
-                if distance_matrix[i, k] + distance_matrix[k, j] < distance_matrix[i, j]:
-                    distance_matrix[i, j] = distance_matrix[i, k] + distance_matrix[k, j]
+    def add_node(self, value):
+        self.graph.add_node(value)
 
-    return distance_matrix
+    def add_edge(self, from_node, to_node, weight):
+        self.graph.add_edge(from_node, to_node, weight=weight)
 
-def draw_directed_graph(graph, pos, edge_labels, title):
-    plt.figure(figsize=(8, 6))
-    nx.draw(graph, pos, with_labels=True, node_size=700, font_size=10, font_color="white", node_color="gold", font_weight="bold", width=2)
+def floyd_warshall_verbose(graph):
+    num_nodes = len(graph.nodes)
+    distances = {node: {other_node: float('infinity') for other_node in graph.nodes} for node in graph.nodes}
+    next_nodes = {node: {other_node: None for other_node in graph.nodes} for node in graph.nodes}
 
-    # Draw edges with arrowheads and edge labels
-    for edge, weight in edge_labels.items():
-        nx.draw_networkx_edges(graph, pos, edgelist=[edge], width=2, edge_color='black', connectionstyle='arc3,rad=0.1', arrowsize=15, arrowstyle='->')
-        nx.draw_networkx_edge_labels(graph, pos, edge_labels={(edge[0], edge[1]): weight}, font_color='red')
+    for node in graph.nodes:
+        distances[node][node] = 0
+        for neighbor, edge_data in graph[node].items():
+            distances[node][neighbor] = edge_data['weight']
+            next_nodes[node][neighbor] = neighbor
 
-    plt.title(title)
+    for k in graph.nodes:
+        for i in graph.nodes:
+            for j in graph.nodes:
+                if distances[i][k] + distances[k][j] < distances[i][j]:
+                    distances[i][j] = distances[i][k] + distances[k][j]
+                    next_nodes[i][j] = next_nodes[i][k]
+
+    return distances, next_nodes
+
+def print_shortest_path(node_i, node_j, next_nodes):
+    path = [node_i]
+    while node_i != node_j:
+        node_i = next_nodes[node_i][node_j]
+        path.append(node_i)
+    return path
+
+def visualize_graph(graph):
+    pos = nx.spring_layout(graph.graph)  # positions for all nodes
+    nx.draw(graph.graph, pos, with_labels=True, font_weight='bold', node_size=700, node_color='skyblue', font_size=8, connectionstyle="arc3,rad=0.1")
+    edge_labels = nx.get_edge_attributes(graph.graph, 'weight')
+    nx.draw_networkx_edge_labels(graph.graph, pos, edge_labels=edge_labels)
+    plt.title("Graph Visualization")
     plt.show()
 
-# Sample directed graphs (all directed)
-simple_directed_graph = {'A': {'B': 2, 'C': 5, 'D': 1}, 'B': {'C': 1, 'D': 3}, 'C': {'D': 2}, 'D': {'A': 7}}
-medium_directed_graph = {'X': {'Y': 2, 'Z': 5}, 'Y': {'Z': 1, 'W': 3}, 'Z': {'W': 2}, 'W': {'X': 7}}
-complex_directed_graph = {'M': {'N': 2, 'O': 5}, 'N': {'O': 1, 'P': 3}, 'O': {'P': 2}, 'P': {'M': 7}}
+# Test Case for Floyd-Warshall with a larger graph
+graph_fw_large = Graph()
+graph_fw_large.add_node("A")
+graph_fw_large.add_node("B")
+graph_fw_large.add_node("C")
+graph_fw_large.add_node("D")
+graph_fw_large.add_node("E")
 
-# Floyd-Warshall results
-vertices = sorted(simple_directed_graph)
-simple_directed_matrix = [[simple_directed_graph.get(u, {}).get(v, np.inf) for v in vertices] for u in vertices]
-result_simple_directed = floyd_warshall(simple_directed_matrix)
-print("Result:\n", result_simple_directed)
-print("\n\n")
+graph_fw_large.add_edge("A", "B", 3)
+graph_fw_large.add_edge("A", "C", 7)
+graph_fw_large.add_edge("B", "C", 2)
+graph_fw_large.add_edge("B", "D", 5)
+graph_fw_large.add_edge("C", "D", 1)
+graph_fw_large.add_edge("D", "E", 8)
+graph_fw_large.add_edge("E", "A", 2)
 
-vertices = sorted(medium_directed_graph)
-medium_directed_matrix = [[medium_directed_graph.get(u, {}).get(v, np.inf) for v in vertices] for u in vertices]
-result_medium_directed = floyd_warshall(medium_directed_matrix)
-print("Result:\n", result_medium_directed)
-print("\n\n")
+print("Floyd-Warshall Algorithm (Larger Graph):")
+visualize_graph(graph_fw_large)
+shortest_distances_fw_large, next_nodes_fw_large = floyd_warshall_verbose(graph_fw_large.graph)
+print("Shortest Distances Matrix:")
+for node in graph_fw_large.graph.nodes:
+    print(f"{node}: {shortest_distances_fw_large[node]}")
 
-vertices = sorted(complex_directed_graph)
-complex_directed_matrix = [[complex_directed_graph.get(u, {}).get(v, np.inf) for v in vertices] for u in vertices]
-result_complex_directed = floyd_warshall(complex_directed_matrix)
-print("Result:\n", result_complex_directed)
-print("\n\n")
-
-# Draw directed graphs with arrows and edge labels
-G_simple_directed = nx.DiGraph(simple_directed_graph)
-pos_simple_directed = nx.spring_layout(G_simple_directed)
-draw_directed_graph(G_simple_directed, pos_simple_directed, nx.get_edge_attributes(G_simple_directed, 'weight'), "Simple Directed Graph (Floyd-Warshall Shortest Paths)")
-
-G_medium_directed = nx.DiGraph(medium_directed_graph)
-pos_medium_directed = nx.spring_layout(G_medium_directed)
-draw_directed_graph(G_medium_directed, pos_medium_directed, nx.get_edge_attributes(G_medium_directed, 'weight'), "Medium Directed Graph (Floyd-Warshall Shortest Paths)")
-
-G_complex_directed = nx.DiGraph(complex_directed_graph)
-pos_complex_directed = nx.spring_layout(G_complex_directed)
-draw_directed_graph(G_complex_directed, pos_complex_directed, nx.get_edge_attributes(G_complex_directed, 'weight'), "Complex Directed Graph (Floyd-Warshall Shortest Paths)")
+# Example of printing the shortest path from 'A' to 'E'
+start_node = 'A'
+end_node = 'E'
+path_A_to_E = print_shortest_path(start_node, end_node, next_nodes_fw_large)
+print(f"Shortest Path from {start_node} to {end_node}: {path_A_to_E}")
