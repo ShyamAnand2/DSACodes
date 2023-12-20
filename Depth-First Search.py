@@ -21,28 +21,28 @@ def dfs(graph, start, visited=None):
 
 # Sample Graphs
 graph_1 = {
-    'A': ['B', 'C'],
-    'B': ['A', 'D', 'E'],
-    'C': ['A', 'F', 'G'],
-    'D': ['B'],
-    'E': ['B'],
-    'F': ['C'],
+    'A': ['D'],
+    'B': ['A'],
+    'C': ['B'],
+    'D': ['E'],
+    'E': ['F'],
+    'F': ['G'],
     'G': ['C']
 }
 
 graph_2 = {
-    '1': ['2', '3'],
-    '2': ['1', '4', '5'],
-    '3': ['1', '6', '7'],
-    '4': ['2'],
-    '5': ['2'],
-    '6': ['3'],
-    '7': ['3']
+    '1': ['2', '6', '7'],
+    '2': ['4'],
+    '3': ['5'],
+    '4': ['3'],
+    '5': ['2', '3'],
+    '6': [],
+    '7': ['4', '6']
 }
 
 graph_3 = {
-    'X': ['Y', 'Z'],
-    'Y': ['X', 'W'],
+    'X': ['W'],
+    'Y': [],
     'Z': ['X'],
     'W': ['Y']
 }
@@ -54,7 +54,7 @@ graph_4 = {
 }
 
 def plot_graph(graph, title):
-    G = nx.Graph(graph)
+    G = nx.DiGraph(graph)
     pos = nx.spring_layout(G)
     nx.draw(G, pos, with_labels=True, node_size=700, font_size=10, font_color="black", node_color="lightcoral", font_weight="bold", width=2)
     plt.title(title)
